@@ -25,7 +25,7 @@ bm25 = pt.BatchRetrieve(pt.get_dataset("vaswani").get_index(), wmodel="BM25")
 pipeline = bm25 >> pt.text.get_text(dataset, "text") >> monoT5
 ```
 
-Note that monoT5 requires the documnt text to be included in the dataframe (see [pt.text.get_text](https://pyterrier.readthedocs.io/en/latest/text.html#pyterrier.text.get_text)).
+Note that monoT5 requires the document text to be included in the dataframe (see [pt.text.get_text](https://pyterrier.readthedocs.io/en/latest/text.html#pyterrier.text.get_text)).
 
 MonoT5ReRanker has the following options:
  - `model` (default: `'castorini/monot5-base-msmarco'`). HGF model name. Defaults to a version trained on MS MARCO passage ranking.
