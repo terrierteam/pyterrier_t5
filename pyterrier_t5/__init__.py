@@ -39,7 +39,13 @@ class MonoT5ReRanker(TransformerBase):
             it = pt.tqdm(it, desc='monoT5 batches')
         for start_idx in it:
             rng = slice(start_idx, start_idx+self.batch_size) # same as start_idx:start_idx+self.batch_size
-            enc = self.tokenizer.batch_encode_plus([f'Query: {q} Document: {d} Relevant:' for q, d in zip(queries[rng], texts[rng])], return_tensors='pt', padding='longest')
+            enc = self.tokenizer.batch_encode_plus([f'Query: {q} Document: {d}' for q, d in zip(queries[rng], texts[rng])], return_tensors='pt', padding='longest')
+            prompts = self.tokenizer.batch_encode_plus([f'Relevant:' for _ in texts[rng]], return_tensors='pt', padding='longest')
+            max_vlen = self.model.config.n_positions - prompts['input_ids'].shape[1]
+            for key, enc_value in list(enc.items()):
+                enc_value = enc_value[:, :-1] # chop off end of sequence token-- this will be added with the prompt
+                enc_value = enc_value[:, :max_vlen] # truncate any tokens that will not fit once the prompt is added
+                enc[key] = torch.cat([enc_value, prompts[key]], dim=1) # add in the prompt to the end
             enc['decoder_input_ids'] = torch.full(
                 (len(queries[rng]), 1),
                 self.model.config.decoder_start_token_id,
