@@ -14,7 +14,8 @@ class MonoT5ReRanker(TransformerBase):
     def __init__(self, 
                  tok_model='t5-base',
                  model='castorini/monot5-base-msmarco',
-                 batch_size=4, 
+                 batch_size=4,
+                 text_field='text',
                  verbose=True):
         self.verbose = verbose
         self.batch_size = batch_size
@@ -23,6 +24,7 @@ class MonoT5ReRanker(TransformerBase):
         self.model = T5ForConditionalGeneration.from_pretrained(model)
         self.model.to(self.device)
         self.model.eval()
+        self.text_field = text_field
         self.REL = self.tokenizer.encode('true')[0]
         self.NREL = self.tokenizer.encode('false')[0]
 
@@ -31,7 +33,7 @@ class MonoT5ReRanker(TransformerBase):
 
     def transform(self, run):
         scores = []
-        queries, texts = run['query'], run['text']
+        queries, texts = run['query'], run[self.text_field]
         it = range(0, len(queries), self.batch_size)
         if self.verbose:
             it = pt.tqdm(it, desc='monoT5 batches')
@@ -50,5 +52,4 @@ class MonoT5ReRanker(TransformerBase):
             scores += F.log_softmax(result, dim=1)[:, 0].cpu().detach().tolist()
         run = run.drop(columns=['score', 'rank'], errors='ignore').assign(score=scores)
         run = add_ranks(run)
-        run = run.sort_values(by=["qid", "score", "docno"], ascending=[True, False, True])
         return run

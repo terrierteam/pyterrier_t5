@@ -23,12 +23,13 @@ bm25 = pt.BatchRetrieve(pt.get_dataset("vaswani").get_index(), wmodel="BM25")
 pipeline = bm25 >> pt.text.get_text(dataset, "text") >> monoT5
 ```
 
-Note that monoT5 requires the documnt text to be included in the dataframe (see `pt.text.get_text`).
+Note that monoT5 requires the documnt text to be included in the dataframe (see [pt.text.get_text](https://pyterrier.readthedocs.io/en/latest/text.html#pyterrier.text.get_text)).
 
 MonoT5ReRanker has the following options:
  - `model` (default: `'castorini/monot5-base-msmarco'`). HGF model name. Defaults to a version trained on MS MARCO passage ranking.
  - `tok_model` (default: `'t5-base'`). HGF tokenizer name.
  - `batch_size` (default: `4`). How many documents to process at the same time.
+ - `text_field` (default: `text`). The field in which the document text is stored.
  - `verbose` (default: `True`). Show progress bar.
 
 ## Examples
@@ -42,7 +43,8 @@ Checkout out the notebooks, even on Colab:
 
 We use a PyTerrier transformer to score documents using a T5 model.
 
-Sequences longer than the model's maximum of 512 tokens are silently truncated.
+Sequences longer than the model's maximum of 512 tokens are silently truncated. Consider splitting long texts
+into passages and aggregating the results ([examples](https://pyterrier.readthedocs.io/en/latest/text.html#working-with-passages-rather-than-documents)).
 
 ## References
 
