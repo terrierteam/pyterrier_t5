@@ -1,6 +1,6 @@
 # PyTerrier_t5
 
-This is the [PyTerrier](https://github.com/terrier-org/pyterrier) plugin for the [Mono T5](https://github.com/castorini/docTTTTTquery) ranking approach [Nogueira21].
+This is the [PyTerrier](https://github.com/terrier-org/pyterrier) plugin for the [Mono T5](https://arxiv.org/pdf/2101.05667.pdf) ranking approach [Nogueira21].
 
 ## Installation
 
