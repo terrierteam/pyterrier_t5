@@ -2,6 +2,8 @@
 
 This is the [PyTerrier](https://github.com/terrier-org/pyterrier) plugin for the [Mono T5](https://arxiv.org/pdf/2101.05667.pdf) ranking approach [Nogueira21].
 
+Note that this package only supports scoring from a pretrained models (like [this one](https://huggingface.co/castorini/monot5-base-msmarco)).
+
 ## Installation
 
 This repostory can be installed using Pip.
