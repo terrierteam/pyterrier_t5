@@ -2,3 +2,4 @@ python-terrier
 pandas
 transformers>=4.0.0
 torch
+sentencepiece>=0.1.95
