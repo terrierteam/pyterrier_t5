@@ -1,5 +1,7 @@
 import sys
 import math
+import warnings
+import itertools
 import pyterrier as pt
 import pandas as pd
 from collections import defaultdict
@@ -8,7 +10,6 @@ import torch
 from torch.nn import functional as F
 from transformers import T5Config, T5Tokenizer, T5ForConditionalGeneration
 from pyterrier.transformer import TransformerBase
-from more_itertools import chunked
 from typing import List
 import re
 
@@ -42,7 +43,7 @@ class MonoT5ReRanker(TransformerBase):
         prompts = self.tokenizer.batch_encode_plus([f'Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
         max_vlen = self.model.config.n_positions - prompts['input_ids'].shape[1]
         if self.verbose:
-            it = pt.tqdm(it, desc='monoT5 (batches)')
+            it = pt.tqdm(it, desc='monoT5', unit='batches')
         for start_idx in it:
             rng = slice(start_idx, start_idx+self.batch_size) # same as start_idx:start_idx+self.batch_size
             enc = self.tokenizer.batch_encode_plus([f'Query: {q} Document: {d}' for q, d in zip(queries[rng], texts[rng])], return_tensors='pt', padding='longest')
@@ -142,18 +143,15 @@ class DuoT5ReRanker(TransformerBase):
         warned = False
         groups = run.groupby('qid')
         if self.verbose:
-            groups = pt.tqdm(groups, desc='duoT5 (queries)')
+            groups = pt.tqdm(groups, desc='duoT5', unit='queries')
         for qid, group in groups:
             if not warned and len(group) > 50:
-                sys.stderr.write(f'A large number of results per query was detected ({len(group)}). Since DuoT5 '
-                                  'is an O(n^2) operation, this will take a considerable amount of time to process. '
-                                  'Consider first reducing the size of the results using the % operator.')
+                warnings.warn(f'A large number of results per query was detected ({len(group)}). Since DuoT5 '
+                               'is an O(n^2) operation, this will take a considerable amount of time to process. '
+                               'Consider first reducing the size of the results using the % operator.')
                 warned = True
-            for row1 in group.itertuples(index=False):
-                for row2 in group.itertuples(index=False):
-                    if row1.docno == row2.docno:
-                        continue
-                    yield row1.qid, row1.query, getattr(row1, self.text_field), getattr(row2, self.text_field), row1.docno, row2.docno
+            for row1, row2 in itertools.combinations(group.itertuples(index=False), 2):
+                yield row1.qid, row1.query, getattr(row1, self.text_field), getattr(row2, self.text_field), row1.docno, row2.docno
 
     def _iter_duo_batches(self, run):
         batch = {'ids': [], 'query': [], 'text0': [], 'text1': []}
