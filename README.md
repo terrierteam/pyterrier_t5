@@ -1,6 +1,6 @@
 # PyTerrier_t5
 
-This is the [PyTerrier](https://github.com/terrier-org/pyterrier) plugin for the [Mono and Duo T5](https://arxiv.org/pdf/2101.05667.pdf) ranking approach [Nogueira21].
+This is the [PyTerrier](https://github.com/terrier-org/pyterrier) plugin for the [Mono and Duo T5](https://arxiv.org/pdf/2101.05667.pdf) ranking approaches [Nogueira21].
 
 Note that this package only supports scoring from a pretrained models (like [this one](https://huggingface.co/castorini/monot5-base-msmarco)).
 
@@ -13,8 +13,8 @@ This repostory can be installed using Pip.
 
 ## Building T5 pipelines
 
-You can use MonoT5 just like any other text-based re-ranker. By default, uses a MonoT5 model
-trained on MS MARCO passage ranking.
+You can use MonoT5 just like any other text-based re-ranker. By default, it uses a MonoT5 model previously
+trained on MS MARCO passage ranking training queries.
 
 ```python
 from pyterrier_t5 import MonoT5ReRanker
@@ -27,13 +27,13 @@ mono_pipeline = bm25 >> pt.text.get_text(dataset, "text") >> monoT5
 duo_pipeline = mono_pipeline % 50 >> duoT5 # apply a rank cutoff of 50 from monoT5 since duoT5 is too costly to run over the full result list
 ```
 
-Note that the models require the document text to be included in the dataframe (see [pt.text.get_text](https://pyterrier.readthedocs.io/en/latest/text.html#pyterrier.text.get_text)).
+Note that both approaches require the document text to be included in the dataframe (see [pt.text.get_text](https://pyterrier.readthedocs.io/en/latest/text.html#pyterrier.text.get_text)).
 
-MonoT5ReRanker and DuoT5ReRanker has the following options:
+MonoT5ReRanker and DuoT5ReRanker have the following options:
  - `model` (default: `'castorini/monot5-base-msmarco'` for mono, `'castorini/duot5-base-msmarco'` for duo). HGF model name. Defaults to a version trained on MS MARCO passage ranking.
  - `tok_model` (default: `'t5-base'`). HGF tokenizer name.
  - `batch_size` (default: `4`). How many documents to process at the same time.
- - `text_field` (default: `text`). The field in which the document text is stored.
+ - `text_field` (default: `text`). The dataframe attribute in which the document text is stored.
  - `verbose` (default: `True`). Show progress bar.
 
 ## Examples
