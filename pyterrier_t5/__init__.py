@@ -150,7 +150,7 @@ class DuoT5ReRanker(TransformerBase):
                                'is an O(n^2) operation, this will take a considerable amount of time to process. '
                                'Consider first reducing the size of the results using the % operator.')
                 warned = True
-            for row1, row2 in itertools.combinations(group.itertuples(index=False), 2):
+            for row1, row2 in itertools.permutations(group.itertuples(index=False), 2):
                 yield row1.qid, row1.query, getattr(row1, self.text_field), getattr(row2, self.text_field), row1.docno, row2.docno
 
     def _iter_duo_batches(self, run):
