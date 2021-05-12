@@ -115,7 +115,7 @@ class DuoT5ReRanker(TransformerBase):
                     query,
                     text0,
                     text1,
-                    prompts[key][:enc_value.shape[0]]], dim=1)
+                    prompts[key][:query.shape[0]]], dim=1)
             enc['decoder_input_ids'] = torch.full(
                 (len(batch['ids']), 1),
                 self.model.config.decoder_start_token_id,
