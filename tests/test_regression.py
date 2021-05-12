@@ -13,13 +13,13 @@ class T5RegressionTests(unittest.TestCase):
         pipeline = bm25 % 20 >> pt.text.get_text(pt.get_dataset('irds:vaswani'), 'text') >> monoT5
         result = pipeline.search('fluid dynamics')
         self.assertEqual(result.iloc[0]['docno'], '11216')
-        self.assertAlmostEqual(result.iloc[0]['score'], -2.186261, places=5)
+        self.assertAlmostEqual(result.iloc[0]['score'], -2.186261, places=4)
         self.assertEqual(result.iloc[0]['rank'], 0)
         self.assertEqual(result.iloc[1]['docno'], '5299')
-        self.assertAlmostEqual(result.iloc[1]['score'], -8.078399, places=5)
+        self.assertAlmostEqual(result.iloc[1]['score'], -8.078399, places=4)
         self.assertEqual(result.iloc[1]['rank'], 1)
         self.assertEqual(result.iloc[-1]['docno'], '3442')
-        self.assertAlmostEqual(result.iloc[-1]['score'], -12.725513, places=5)
+        self.assertAlmostEqual(result.iloc[-1]['score'], -12.725513, places=4)
         self.assertEqual(result.iloc[-1]['rank'], 19)
 
     def test_duot5_vaswani(self):
