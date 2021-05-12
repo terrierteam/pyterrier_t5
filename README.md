@@ -1,6 +1,6 @@
 # PyTerrier_t5
 
-This is the [PyTerrier](https://github.com/terrier-org/pyterrier) plugin for the [Mono T5](https://arxiv.org/pdf/2101.05667.pdf) ranking approach [Nogueira21].
+This is the [PyTerrier](https://github.com/terrier-org/pyterrier) plugin for the [Mono and Duo T5](https://arxiv.org/pdf/2101.05667.pdf) ranking approach [Nogueira21].
 
 Note that this package only supports scoring from a pretrained models (like [this one](https://huggingface.co/castorini/monot5-base-msmarco)).
 
@@ -11,24 +11,26 @@ This repostory can be installed using Pip.
     pip install --upgrade git+https://github.com/terrierteam/pyterrier_t5.git
 
 
-## Building a MonoT5 pipeline
+## Building T5 pipelines
 
 You can use MonoT5 just like any other text-based re-ranker. By default, uses a MonoT5 model
 trained on MS MARCO passage ranking.
 
 ```python
 from pyterrier_t5 import MonoT5ReRanker
-monoT5 = MonoT5ReRanker()
+monoT5 = MonoT5ReRanker() # loads castorini/monot5-base-msmarco by default
+duoT5 = DuoT5ReRanker() # loads castorini/duot5-base-msmarco by default
 
 dataset = pt.get_dataset("irds:vaswani")
 bm25 = pt.BatchRetrieve(pt.get_dataset("vaswani").get_index(), wmodel="BM25")
-pipeline = bm25 >> pt.text.get_text(dataset, "text") >> monoT5
+mono_pipeline = bm25 >> pt.text.get_text(dataset, "text") >> monoT5
+duo_pipeline = mono_pipeline % 50 >> duoT5 # apply a rank cutoff of 50 from monoT5 since duoT5 is too costly to run over the full result list
 ```
 
-Note that monoT5 requires the document text to be included in the dataframe (see [pt.text.get_text](https://pyterrier.readthedocs.io/en/latest/text.html#pyterrier.text.get_text)).
+Note that the models require the document text to be included in the dataframe (see [pt.text.get_text](https://pyterrier.readthedocs.io/en/latest/text.html#pyterrier.text.get_text)).
 
-MonoT5ReRanker has the following options:
- - `model` (default: `'castorini/monot5-base-msmarco'`). HGF model name. Defaults to a version trained on MS MARCO passage ranking.
+MonoT5ReRanker and DuoT5ReRanker has the following options:
+ - `model` (default: `'castorini/monot5-base-msmarco'` for mono, `'castorini/duot5-base-msmarco'` for duo). HGF model name. Defaults to a version trained on MS MARCO passage ranking.
  - `tok_model` (default: `'t5-base'`). HGF tokenizer name.
  - `batch_size` (default: `4`). How many documents to process at the same time.
  - `text_field` (default: `text`). The field in which the document text is stored.
