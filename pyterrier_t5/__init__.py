@@ -8,7 +8,7 @@ from collections import defaultdict
 from pyterrier.model import add_ranks
 import torch
 from torch.nn import functional as F
-from transformers import T5Config, T5Tokenizer, T5ForConditionalGeneration, AutoTokenizer, AutoModelForSeq2SeqLM
+from transformers import T5Config, T5Tokenizer, T5ForConditionalGeneration
 from pyterrier.transformer import TransformerBase
 from typing import List
 import re
@@ -177,9 +177,9 @@ class mT5ReRanker(TransformerBase):
         self.verbose = verbose
         self.batch_size = batch_size
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.tokenizer = AutoTokenizer.from_pretrained(tok_model)
+        self.tokenizer = T5Tokenizer.from_pretrained(tok_model)
         self.model_name = model
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(model)
+        self.model = MT5ForConditionalGeneration.from_pretrained(model)
         self.model.to(self.device)
         self.model.eval()
         self.text_field = text_field
