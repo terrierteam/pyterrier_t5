@@ -8,7 +8,7 @@ from collections import defaultdict
 from pyterrier.model import add_ranks
 import torch
 from torch.nn import functional as F
-from transformers import T5Config, T5Tokenizer, T5ForConditionalGeneration
+from transformers import T5Config, T5Tokenizer, T5ForConditionalGeneration, MT5ForConditionalGeneration
 from pyterrier.transformer import TransformerBase
 from typing import List
 import re
