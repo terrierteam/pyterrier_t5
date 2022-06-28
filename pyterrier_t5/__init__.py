@@ -183,8 +183,8 @@ class mT5ReRanker(TransformerBase):
         self.model.to(self.device)
         self.model.eval()
         self.text_field = text_field
-        self.REL = self.tokenizer.encode('true')[0]
-        self.NREL = self.tokenizer.encode('false')[0]
+        self.REL = self.tokenizer.encode('yes')[0]
+        self.NREL = self.tokenizer.encode('no')[0]
 
     def __str__(self):
         return f"mT5({self.model_name})"
