@@ -194,7 +194,7 @@ class mT5ReRanker(TransformerBase):
         queries, texts = run['query'], run[self.text_field]
         it = range(0, len(queries), self.batch_size)
         prompts = self.tokenizer.batch_encode_plus([f'Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
-        max_vlen = self.model.config.n_positions - prompts['input_ids'].shape[1]
+        max_vlen = 512 - prompts['input_ids'].shape[1] #mT5Config doesn't have n_positions so we fallback to 512
         if self.verbose:
             it = pt.tqdm(it, desc='monoT5', unit='batches')
         for start_idx in it:
