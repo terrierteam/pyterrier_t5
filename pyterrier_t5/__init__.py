@@ -98,8 +98,8 @@ class DuoT5ReRanker(TransformerBase):
         max_vlen = self.model.config.n_positions - prompts['input_ids'].shape[1]
         for batch in self._iter_duo_batches(run):
             enc_query = self.tokenizer.batch_encode_plus([f'Query: {q}' for q in batch['query']], return_tensors='pt', padding='longest')
-            enc_text0 = self.tokenizer.batch_encode_plus([f'Query: {q}' for q in batch['text0']], return_tensors='pt', padding='longest')
-            enc_text1 = self.tokenizer.batch_encode_plus([f'Query: {q}' for q in batch['text1']], return_tensors='pt', padding='longest')
+            enc_text0 = self.tokenizer.batch_encode_plus([f'Document0: {q}' for q in batch['text0']], return_tensors='pt', padding='longest')
+            enc_text1 = self.tokenizer.batch_encode_plus([f'Document1: {q}' for q in batch['text1']], return_tensors='pt', padding='longest')
             enc = {}
             for key in enc_query:
                 query = enc_query[key][:, :-1] # chop off end of sequence token-- this will be added with the prompt
