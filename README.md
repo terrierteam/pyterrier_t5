@@ -1,6 +1,6 @@
 # PyTerrier_t5
 
-This is the [PyTerrier](https://github.com/terrier-org/pyterrier) plugin for the [Mono and Duo T5](https://arxiv.org/pdf/2101.05667.pdf) ranking approaches [Nogueira21].
+This is the [PyTerrier](https://github.com/terrier-org/pyterrier) plugin for the [Mono and Duo T5](https://arxiv.org/pdf/2101.05667.pdf) ranking approaches [[Nogueira21]](#Nogueira21).
 
 Note that this package only supports scoring from a pretrained models (like [this one](https://huggingface.co/castorini/monot5-base-msmarco)).
 
@@ -53,8 +53,8 @@ into passages and aggregating the results ([examples](https://pyterrier.readthed
 
 ## References
 
-  - [Nogueira21]: Ronak Pradeep, Rodrigo Nogueira, and Jimmy Lin. The Expando-Mono-Duo Design Pattern for Text Ranking withPretrained Sequence-to-Sequence Models. https://arxiv.org/pdf/2101.05667.pdf
-  - [Macdonald20]: Craig Macdonald, Nicola Tonellotto. Declarative Experimentation inInformation Retrieval using PyTerrier. Craig Macdonald and Nicola Tonellotto. In Proceedings of ICTIR 2020. https://arxiv.org/abs/2007.14271
+  - <a id="Nogueira21"/>Ronak Pradeep, Rodrigo Nogueira, and Jimmy Lin. The Expando-Mono-Duo Design Pattern for Text Ranking withPretrained Sequence-to-Sequence Models. https://arxiv.org/pdf/2101.05667.pdf
+  - <a id="Macdonald20"/>Craig Macdonald, Nicola Tonellotto. Declarative Experimentation inInformation Retrieval using PyTerrier. Craig Macdonald and Nicola Tonellotto. In Proceedings of ICTIR 2020. https://arxiv.org/abs/2007.14271
 
 ## Credits
 
