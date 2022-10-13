@@ -17,7 +17,8 @@ You can use MonoT5 just like any other text-based re-ranker. By default, it uses
 trained on MS MARCO passage ranking training queries.
 
 ```python
-from pyterrier_t5 import MonoT5ReRanker
+import pyterrier as pt
+from pyterrier_t5 import MonoT5ReRanker, DuoT5ReRanker
 monoT5 = MonoT5ReRanker() # loads castorini/monot5-base-msmarco by default
 duoT5 = DuoT5ReRanker() # loads castorini/duot5-base-msmarco by default
 
