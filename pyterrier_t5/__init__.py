@@ -9,12 +9,12 @@ from pyterrier.model import add_ranks
 import torch
 from torch.nn import functional as F
 from transformers import T5Config, T5Tokenizer, T5ForConditionalGeneration
-from pyterrier.transformer import TransformerBase
+from pyterrier import Transformer
 from typing import List
 import re
 
 
-class MonoT5ReRanker(TransformerBase):
+class MonoT5ReRanker(Transformer):
     def __init__(self, 
                  tok_model='t5-base',
                  model='castorini/monot5-base-msmarco',
@@ -66,7 +66,7 @@ class MonoT5ReRanker(TransformerBase):
         return run
 
 
-class DuoT5ReRanker(TransformerBase):
+class DuoT5ReRanker(Transformer):
     def __init__(self, 
                  tok_model='t5-base',
                  model='castorini/duot5-base-msmarco',
