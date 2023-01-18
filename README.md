@@ -41,6 +41,7 @@ MonoT5ReRanker and DuoT5ReRanker have the following options:
 
 Checkout out the notebooks, even on Colab:
 
+ - Reranking a dataframe [[Github](https://github.com/terrierteam/pyterrier_t5/blob/master/pyterrier_monoT5_direct_rerank.ipynb)] [[Colab](https://colab.research.google.com/github/terrierteam/pyterrier_t5/blob/master/pyterrier_monoT5_direct_rerank.ipynb)]
  - Vaswani [[Github](https://github.com/terrierteam/pyterrier_t5/blob/master/pyterrier_t5_vaswani.ipynb)] [[Colab](https://colab.research.google.com/github/terrierteam/pyterrier_t5/blob/master/pyterrier_t5_vaswani.ipynb)]
  - TREC-COVID [[Github](https://github.com/terrierteam/pyterrier_t5/blob/master/pyterrier_t5_trec-covid.ipynb)] [[Colab](https://colab.research.google.com/github/terrierteam/pyterrier_t5/blob/master/pyterrier_t5_trec-covid.ipynb)]
 
