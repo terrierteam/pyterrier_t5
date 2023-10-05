@@ -11,11 +11,11 @@ on:
 
 jobs:
   build:
-    
+
     strategy:
       matrix:
-        python-version: [3.8]
-        java: [11] # [11, 13]
+        python-version: [3.8, 3.9, 3.11]
+        java: [21]
         os: ['ubuntu-latest'] # ['ubuntu-latest', 'macOs-latest', 'windows-latest']
         architecture: ['x64']
         terrier: ['snapshot']
@@ -28,13 +28,13 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-    
+
     - name: Setup java
       uses: actions/setup-java@v1
       with:
         java-version: ${{ matrix.java }}
         architecture: ${{ matrix.architecture }}
-    
+
     - name: Install Terrier snapshot
       if: matrix.terrier == '5.4-SNAPSHOT'
       run: |
@@ -45,7 +45,6 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --upgrade git+https://github.com/kivy/pyjnius.git#egg=pyjnius
         pip install -r requirements.txt
         #install this software
         pip install --timeout=120 .
