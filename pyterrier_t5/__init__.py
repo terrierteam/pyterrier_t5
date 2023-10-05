@@ -88,7 +88,7 @@ class DuoT5ReRanker(Transformer):
                  verbose=True,
                  agg='sum',
                  model_max_length=512,
-                truncation=True,
+                 truncation=True,
                  ):
         self.verbose = verbose
         self.model_max_length = model_max_length
