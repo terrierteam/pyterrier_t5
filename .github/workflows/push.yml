@@ -93,9 +93,7 @@ jobs:
         #install this software
         pip install --timeout=120 .
         pip install pytest
-        pip install pypi-timemachine
-        pypi-timemachine 2020-10-01 # transformers Version 4.0.0
-        pip install --upgrade --force-reinstall --index-url http://127.0.0.1:5000/ "transformers==4.0.0"
+        pip install --upgrade --force-reinstall "transformers==4.0.0" "numpy==1.19.5" "filelock==3.0.12" "requests==2.25.0" "tqdm==4.54.1" "regex==2020.11.13" "sacremoses==0.0.43"
     
     - name: Assert transformers version
       run: |
