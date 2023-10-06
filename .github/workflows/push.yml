@@ -55,7 +55,7 @@ jobs:
       run: |
         pytest
 
-  test_minimal:
+  test_minimal_transformers_version:
     strategy:
       matrix:
         python-version: [3.8, 3.9, 3.11]
@@ -93,7 +93,7 @@ jobs:
         #install this software
         pip install --timeout=120 .
         pip install pytest
-        pip install --upgrade --force-reinstall "transformers==4.0.0" "packaging==21" "python-terrier==0.5.0"
+        pip install --upgrade --force-reinstall "transformers==4.0.0" "packaging==21"
 
     - name: All unit tests
       env:
