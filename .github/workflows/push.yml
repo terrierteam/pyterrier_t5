@@ -58,8 +58,8 @@ jobs:
   test_minimal_transformers_version:
     strategy:
       matrix:
-        python-version: [3.8, 3.9, 3.11]
-        java: [11, 17, 21]
+        python-version: [3.8]
+        java: [11]
         os: ['ubuntu-latest'] # ['ubuntu-latest', 'macOs-latest', 'windows-latest']
         architecture: ['x64']
         terrier: ['snapshot']
@@ -93,7 +93,13 @@ jobs:
         #install this software
         pip install --timeout=120 .
         pip install pytest
-        pip install --upgrade --force-reinstall "transformers==4.0.0" "packaging==21"
+        pip install pypi-timemachine
+        pypi-timemachine 2020-10-01 # transformers Version 4.0.0
+        pip install --upgrade --force-reinstall --index-url http://127.0.0.1:5000/ "transformers==4.0.0"
+    
+    - name: Assert transformers version
+      run: |
+        python -c "import transformers; assert transformers.__version__ == '4.0.0', f'Expected version 4.0.0, but got {transformers.__version__}'"
 
     - name: All unit tests
       env:
