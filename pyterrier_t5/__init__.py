@@ -1,30 +1,31 @@
-import sys
 import math
 import warnings
 import itertools
 import pyterrier as pt
-import pandas as pd
 from collections import defaultdict
 from pyterrier.model import add_ranks
 import torch
 from torch.nn import functional as F
-from transformers import T5Config, T5Tokenizer, T5ForConditionalGeneration
-from pyterrier.transformer import TransformerBase
-from typing import List
-import re
+from transformers import T5Tokenizer, T5ForConditionalGeneration
+from pyterrier.transformer import Transformer
 
 
-class MonoT5ReRanker(TransformerBase):
-    def __init__(self, 
+class MonoT5ReRanker(Transformer):
+    def __init__(self,
                  tok_model='t5-base',
                  model='castorini/monot5-base-msmarco',
                  batch_size=4,
                  text_field='text',
-                 verbose=True):
+                 verbose=True,
+                 model_max_length=512,
+                 truncation=True,
+                 ):
         self.verbose = verbose
+        self.model_max_length = model_max_length
+        self.truncation = truncation
         self.batch_size = batch_size
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.tokenizer = T5Tokenizer.from_pretrained(tok_model)
+        self.tokenizer = T5Tokenizer.from_pretrained(tok_model, legacy=False, model_max_length=model_max_length)
         self.model_name = model
         self.model = T5ForConditionalGeneration.from_pretrained(model)
         self.model.to(self.device)
@@ -40,13 +41,25 @@ class MonoT5ReRanker(TransformerBase):
         scores = []
         queries, texts = run['query'], run[self.text_field]
         it = range(0, len(queries), self.batch_size)
-        prompts = self.tokenizer.batch_encode_plus([f'Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
+        prompts = self.tokenizer.batch_encode_plus(
+            [f'Relevant:' for _ in range(self.batch_size)],
+            return_tensors='pt',
+            padding='longest',
+            truncation=self.truncation,
+            max_length=self.model_max_length
+        )
         max_vlen = self.model.config.n_positions - prompts['input_ids'].shape[1]
         if self.verbose:
             it = pt.tqdm(it, desc='monoT5', unit='batches')
         for start_idx in it:
             rng = slice(start_idx, start_idx+self.batch_size) # same as start_idx:start_idx+self.batch_size
-            enc = self.tokenizer.batch_encode_plus([f'Query: {q} Document: {d}' for q, d in zip(queries[rng], texts[rng])], return_tensors='pt', padding='longest')
+            enc = self.tokenizer.batch_encode_plus(
+                [f'Query: {q} Document: {d}' for q, d in zip(queries[rng], texts[rng])],
+                return_tensors='pt',
+                padding='longest',
+                truncation=self.truncation,
+                max_length=self.model_max_length
+            )
             for key, enc_value in list(enc.items()):
                 enc_value = enc_value[:, :-1] # chop off end of sequence token-- this will be added with the prompt
                 enc_value = enc_value[:, :max_vlen] # truncate any tokens that will not fit once the prompt is added
@@ -66,18 +79,23 @@ class MonoT5ReRanker(TransformerBase):
         return run
 
 
-class DuoT5ReRanker(TransformerBase):
-    def __init__(self, 
+class DuoT5ReRanker(Transformer):
+    def __init__(self,
                  tok_model='t5-base',
                  model='castorini/duot5-base-msmarco',
                  batch_size=4,
                  text_field='text',
                  verbose=True,
-                 agg='sum'):
+                 agg='sum',
+                 model_max_length=512,
+                 truncation=True,
+                 ):
         self.verbose = verbose
+        self.model_max_length = model_max_length
+        self.truncation = truncation
         self.batch_size = batch_size
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.tokenizer = T5Tokenizer.from_pretrained(tok_model)
+        self.tokenizer = T5Tokenizer.from_pretrained(tok_model, legacy=False, model_max_length=model_max_length)
         self.model_name = model
         self.model = T5ForConditionalGeneration.from_pretrained(model)
         self.model.to(self.device)
@@ -94,12 +112,36 @@ class DuoT5ReRanker(TransformerBase):
     def transform(self, run):
         queries, texts = run['query'], run[self.text_field]
         scores = defaultdict(lambda: 0.)
-        prompts = self.tokenizer.batch_encode_plus([f'Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
+        prompts = self.tokenizer.batch_encode_plus(
+            [f'Relevant:' for _ in range(self.batch_size)],
+            return_tensors='pt',
+            padding='longest',
+            truncation=self.truncation,
+            max_length=self.model_max_length
+        )
         max_vlen = self.model.config.n_positions - prompts['input_ids'].shape[1]
         for batch in self._iter_duo_batches(run):
-            enc_query = self.tokenizer.batch_encode_plus([f'Query: {q}' for q in batch['query']], return_tensors='pt', padding='longest')
-            enc_text0 = self.tokenizer.batch_encode_plus([f'Document0: {q}' for q in batch['text0']], return_tensors='pt', padding='longest')
-            enc_text1 = self.tokenizer.batch_encode_plus([f'Document1: {q}' for q in batch['text1']], return_tensors='pt', padding='longest')
+            enc_query = self.tokenizer.batch_encode_plus(
+                [f'Query: {q}' for q in batch['query']],
+                return_tensors='pt',
+                padding='longest',
+                truncation=self.truncation,
+                max_length=self.model_max_length
+            )
+            enc_text0 = self.tokenizer.batch_encode_plus(
+                [f'Document0: {q}' for q in batch['text0']],
+                return_tensors='pt',
+                padding='longest',
+                truncation=self.truncation,
+                max_length=self.model_max_length
+            )
+            enc_text1 = self.tokenizer.batch_encode_plus(
+                [f'Document1: {q}' for q in batch['text1']],
+                return_tensors='pt',
+                padding='longest',
+                truncation=self.truncation,
+                max_length=self.model_max_length
+            )
             enc = {}
             for key in enc_query:
                 query = enc_query[key][:, :-1] # chop off end of sequence token-- this will be added with the prompt
