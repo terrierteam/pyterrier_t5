@@ -167,7 +167,7 @@ class DuoT5ReRanker(TransformerBase):
         if len(batch['ids']) > 0:
             yield batch
 
-class mT5ReRanker(TransformerBase):
+class mT5ReRanker(pt.Transformer):
     def __init__(self, 
                  tok_model='unicamp-dl/mt5-base-mmarco-v2',
                  model='unicamp-dl/mt5-base-mmarco-v2',
