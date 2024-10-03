@@ -25,27 +25,21 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     
     - name: Setup java
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v4
       with:
+        distribution: 'temurin'
         java-version: ${{ matrix.java }}
         architecture: ${{ matrix.architecture }}
-    
-    - name: Install Terrier snapshot
-      if: matrix.terrier == '5.4-SNAPSHOT'
-      run: |
-        git clone https://github.com/terrier-org/terrier-core.git
-        cd terrier-core
-        mvn -B -DskipTests install
+
 
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --upgrade git+https://github.com/kivy/pyjnius.git#egg=pyjnius
         pip install -r requirements.txt
         #install this software
         pip install --timeout=120 .
