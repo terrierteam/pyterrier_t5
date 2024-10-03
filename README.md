@@ -25,7 +25,7 @@ duoT5 = DuoT5ReRanker() # loads castorini/duot5-base-msmarco by default
 dataset = pt.get_dataset("irds:vaswani")
 bm25 = pt.BatchRetrieve(pt.get_dataset("vaswani").get_index(), wmodel="BM25")
 mono_pipeline = bm25 >> pt.text.get_text(dataset, "text") >> monoT5
-duo_pipeline = mono_pipeline % 50 >> duoT5 # apply a rank cutoff of 50 from monoT5 since duoT5 is too costly to run over the full result list
+duo_pipeline = mono_pipeline % 5 >> duoT5 # apply a rank cutoff of 5 from monoT5 since duoT5 is too costly to run over the full result list
 ```
 
 Note that both approaches require the document text to be included in the dataframe (see [pt.text.get_text](https://pyterrier.readthedocs.io/en/latest/text.html#pyterrier.text.get_text)).
