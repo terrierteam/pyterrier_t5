@@ -1,16 +1,14 @@
-import sys
+__version__ = '0.1.0'
+
 import math
 import warnings
 import itertools
 import pyterrier as pt
-import pandas as pd
 from collections import defaultdict
 from pyterrier.model import add_ranks
 import torch
 from torch.nn import functional as F
-from transformers import T5Config, T5Tokenizer, T5ForConditionalGeneration, MT5ForConditionalGeneration
-from typing import List
-import re
+from transformers import T5Tokenizer, T5ForConditionalGeneration, MT5ForConditionalGeneration
 
 
 class MonoT5ReRanker(pt.Transformer):
@@ -39,7 +37,7 @@ class MonoT5ReRanker(pt.Transformer):
         scores = []
         queries, texts = run['query'], run[self.text_field]
         it = range(0, len(queries), self.batch_size)
-        prompts = self.tokenizer.batch_encode_plus([f'Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
+        prompts = self.tokenizer.batch_encode_plus(['Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
         max_vlen = self.model.config.n_positions - prompts['input_ids'].shape[1]
         if self.verbose:
             it = pt.tqdm(it, desc='monoT5', unit='batches')
@@ -91,9 +89,8 @@ class DuoT5ReRanker(pt.Transformer):
         return f"DuoT5({self.model_name})"
 
     def transform(self, run):
-        queries, texts = run['query'], run[self.text_field]
         scores = defaultdict(lambda: 0.)
-        prompts = self.tokenizer.batch_encode_plus([f'Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
+        prompts = self.tokenizer.batch_encode_plus(['Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
         max_vlen = self.model.config.n_positions - prompts['input_ids'].shape[1]
         for batch in self._iter_duo_batches(run):
             enc_query = self.tokenizer.batch_encode_plus([f'Query: {q}' for q in batch['query']], return_tensors='pt', padding='longest')
@@ -192,7 +189,7 @@ class mT5ReRanker(pt.Transformer):
         scores = []
         queries, texts = run['query'], run[self.text_field]
         it = range(0, len(queries), self.batch_size)
-        prompts = self.tokenizer.batch_encode_plus([f'Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
+        prompts = self.tokenizer.batch_encode_plus(['Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
         max_vlen = 512 - prompts['input_ids'].shape[1] #mT5Config doesn't have n_positions so we fallback to 512
         if self.verbose:
             it = pt.tqdm(it, desc='monoT5', unit='batches')
