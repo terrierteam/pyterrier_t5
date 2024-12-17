@@ -17,10 +17,13 @@ class MonoT5ReRanker(pt.Transformer):
                  model='castorini/monot5-base-msmarco',
                  batch_size=4,
                  text_field='text',
+                 device=None,
                  verbose=True):
         self.verbose = verbose
         self.batch_size = batch_size
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        if device is None:
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.device = torch.device(device)
         self.tokenizer = T5Tokenizer.from_pretrained(tok_model)
         self.model_name = model
         self.model = T5ForConditionalGeneration.from_pretrained(model)
@@ -69,11 +72,14 @@ class DuoT5ReRanker(pt.Transformer):
                  model='castorini/duot5-base-msmarco',
                  batch_size=4,
                  text_field='text',
+                 device=None,
                  verbose=True,
                  agg='sum'):
         self.verbose = verbose
         self.batch_size = batch_size
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        if device is None:
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.device = torch.device(device)
         self.tokenizer = T5Tokenizer.from_pretrained(tok_model)
         self.model_name = model
         self.model = T5ForConditionalGeneration.from_pretrained(model)
