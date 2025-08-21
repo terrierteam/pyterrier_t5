@@ -1,4 +1,10 @@
-__version__ = '0.1.0'
+__version__ = '0.2.0'
+
+__all__ = [
+    'MonoT5ReRanker',
+    'DuoT5ReRanker',
+    'mT5ReRanker'
+]
 
 import math
 import warnings
@@ -34,6 +40,7 @@ class MonoT5ReRanker(pt.Transformer):
         return f"MonoT5({self.model_name})"
 
     def transform(self, run):
+        pt.validate.result_frame(run, extra_columns=['query', self.text_field])
         scores = []
         queries, texts = run['query'], run[self.text_field]
         it = range(0, len(queries), self.batch_size)
@@ -89,6 +96,7 @@ class DuoT5ReRanker(pt.Transformer):
         return f"DuoT5({self.model_name})"
 
     def transform(self, run):
+        pt.validate.result_frame(run, extra_columns=['query', self.text_field])
         scores = defaultdict(lambda: 0.)
         prompts = self.tokenizer.batch_encode_plus(['Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
         max_vlen = self.model.config.n_positions - prompts['input_ids'].shape[1]
@@ -186,6 +194,7 @@ class mT5ReRanker(pt.Transformer):
         return f"mT5({self.model_name})"
 
     def transform(self, run):
+        pt.validate.result_frame(run, extra_columns=['query', self.text_field])
         scores = []
         queries, texts = run['query'], run[self.text_field]
         it = range(0, len(queries), self.batch_size)
