@@ -46,7 +46,7 @@ class MonoT5ReRanker(pt.Transformer):
         it = range(0, len(queries), self.batch_size)
         prompts = self.tokenizer.batch_encode_plus(['Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
         max_vlen = self.model.config.n_positions - prompts['input_ids'].shape[1]
-        if self.verbose:
+        if self.verbose and len(queries): # hide tqdm for 0-length inputs
             it = pt.tqdm(it, desc='monoT5', unit='batches')
         for start_idx in it:
             rng = slice(start_idx, start_idx+self.batch_size) # same as start_idx:start_idx+self.batch_size
@@ -146,7 +146,7 @@ class DuoT5ReRanker(pt.Transformer):
     def _iter_duo_pairs(self, run):
         warned = False
         groups = run.groupby('qid')
-        if self.verbose:
+        if self.verbose and len(run) # hide tqdm for 0-length inputs:
             groups = pt.tqdm(groups, desc='duoT5', unit='queries')
         for qid, group in groups:
             if not warned and len(group) > 50:
@@ -200,7 +200,7 @@ class mT5ReRanker(pt.Transformer):
         it = range(0, len(queries), self.batch_size)
         prompts = self.tokenizer.batch_encode_plus(['Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
         max_vlen = 512 - prompts['input_ids'].shape[1] #mT5Config doesn't have n_positions so we fallback to 512
-        if self.verbose:
+        if self.verbose and len(run): # hide tqdm for 0-length inputs
             it = pt.tqdm(it, desc='monoT5', unit='batches')
         for start_idx in it:
             rng = slice(start_idx, start_idx+self.batch_size) # same as start_idx:start_idx+self.batch_size
