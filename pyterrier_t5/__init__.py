@@ -146,7 +146,7 @@ class DuoT5ReRanker(pt.Transformer):
     def _iter_duo_pairs(self, run):
         warned = False
         groups = run.groupby('qid')
-        if self.verbose and len(run) # hide tqdm for 0-length inputs:
+        if self.verbose and len(run): # hide tqdm for 0-length inputs
             groups = pt.tqdm(groups, desc='duoT5', unit='queries')
         for qid, group in groups:
             if not warned and len(group) > 50:
