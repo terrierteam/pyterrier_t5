@@ -2,3 +2,4 @@ python-terrier>=0.9.0
 transformers>=4.0.0
 torch
 sentencepiece>=0.1.95
+pyterrier-alpha
