@@ -1,4 +1,4 @@
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 __all__ = [
     'MonoT5ReRanker',
@@ -19,6 +19,7 @@ from transformers import T5Tokenizer, T5ForConditionalGeneration, MT5ForConditio
 
 
 class MonoT5ReRanker(pt.Transformer):
+    schematic = {'label': 'MonoT5'}
     def __init__(self, 
                  tok_model='t5-base',
                  model='castorini/monot5-base-msmarco',
@@ -72,6 +73,7 @@ class MonoT5ReRanker(pt.Transformer):
 
 
 class DuoT5ReRanker(pt.Transformer):
+    schematic = {'label': 'DuoT5'}
     def __init__(self, 
                  tok_model='t5-base',
                  model='castorini/duot5-base-msmarco',
