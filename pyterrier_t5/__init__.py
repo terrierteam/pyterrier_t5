@@ -55,7 +55,7 @@ class MonoT5ReRanker(pt.Transformer):
             it = pt.tqdm(it, desc='monoT5', unit='batches')
         for start_idx in it:
             rng = slice(start_idx, start_idx+self.batch_size) # same as start_idx:start_idx+self.batch_size
-            enc = self.tokenizer([f'Query: {q} Document: {d}' for q, d in zip(queries[rng], texts[rng])], return_tensors='pt', padding='longest')
+            enc = self.tokenizer([f'Query: {q} Document: {d}' for q, d in zip(queries[rng], texts[rng])], return_tensors='pt', padding='longest') 
             for key, enc_value in list(enc.items()):
                 enc_value = enc_value[:, :-1] # chop off end of sequence token-- this will be added with the prompt
                 enc_value = enc_value[:, :max_vlen] # truncate any tokens that will not fit once the prompt is added
