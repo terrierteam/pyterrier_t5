@@ -49,13 +49,13 @@ class MonoT5ReRanker(pt.Transformer):
         scores = []
         queries, texts = run['query'], run[self.text_field]
         it = range(0, len(queries), self.batch_size)
-        prompts = self.tokenizer.batch_encode_plus(['Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
+        prompts = self.tokenizer(['Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
         max_vlen = self.model.config.n_positions - prompts['input_ids'].shape[1]
         if self.verbose and len(queries): # hide tqdm for 0-length inputs
             it = pt.tqdm(it, desc='monoT5', unit='batches')
         for start_idx in it:
             rng = slice(start_idx, start_idx+self.batch_size) # same as start_idx:start_idx+self.batch_size
-            enc = self.tokenizer.batch_encode_plus([f'Query: {q} Document: {d}' for q, d in zip(queries[rng], texts[rng])], return_tensors='pt', padding='longest')
+            enc = self.tokenizer([f'Query: {q} Document: {d}' for q, d in zip(queries[rng], texts[rng])], return_tensors='pt', padding='longest')
             for key, enc_value in list(enc.items()):
                 enc_value = enc_value[:, :-1] # chop off end of sequence token-- this will be added with the prompt
                 enc_value = enc_value[:, :max_vlen] # truncate any tokens that will not fit once the prompt is added
@@ -107,12 +107,12 @@ class DuoT5ReRanker(pt.Transformer):
     def transform(self, run):
         pta.validate.result_frame(run, extra_columns=['query', self.text_field])
         scores = defaultdict(lambda: 0.)
-        prompts = self.tokenizer.batch_encode_plus(['Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
+        prompts = self.tokenizer(['Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
         max_vlen = self.model.config.n_positions - prompts['input_ids'].shape[1]
         for batch in self._iter_duo_batches(run):
-            enc_query = self.tokenizer.batch_encode_plus([f'Query: {q}' for q in batch['query']], return_tensors='pt', padding='longest')
-            enc_text0 = self.tokenizer.batch_encode_plus([f'Document0: {q}' for q in batch['text0']], return_tensors='pt', padding='longest')
-            enc_text1 = self.tokenizer.batch_encode_plus([f'Document1: {q}' for q in batch['text1']], return_tensors='pt', padding='longest')
+            enc_query = self.tokenizer([f'Query: {q}' for q in batch['query']], return_tensors='pt', padding='longest')
+            enc_text0 = self.tokenizer([f'Document0: {q}' for q in batch['text0']], return_tensors='pt', padding='longest')
+            enc_text1 = self.tokenizer([f'Document1: {q}' for q in batch['text1']], return_tensors='pt', padding='longest')
             enc = {}
             for key in enc_query:
                 query = enc_query[key][:, :-1] # chop off end of sequence token-- this will be added with the prompt
@@ -207,13 +207,13 @@ class mT5ReRanker(pt.Transformer):
         scores = []
         queries, texts = run['query'], run[self.text_field]
         it = range(0, len(queries), self.batch_size)
-        prompts = self.tokenizer.batch_encode_plus(['Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
+        prompts = self.tokenizer(['Relevant:' for _ in range(self.batch_size)], return_tensors='pt', padding='longest')
         max_vlen = 512 - prompts['input_ids'].shape[1] #mT5Config doesn't have n_positions so we fallback to 512
         if self.verbose and len(run): # hide tqdm for 0-length inputs
             it = pt.tqdm(it, desc='monoT5', unit='batches')
         for start_idx in it:
             rng = slice(start_idx, start_idx+self.batch_size) # same as start_idx:start_idx+self.batch_size
-            enc = self.tokenizer.batch_encode_plus([f'Query: {q} Document: {d}' for q, d in zip(queries[rng], texts[rng])], return_tensors='pt', padding='longest')
+            enc = self.tokenizer([f'Query: {q} Document: {d}' for q, d in zip(queries[rng], texts[rng])], return_tensors='pt', padding='longest')
             for key, enc_value in list(enc.items()):
                 enc_value = enc_value[:, :-1] # chop off end of sequence token-- this will be added with the prompt
                 enc_value = enc_value[:, :max_vlen] # truncate any tokens that will not fit once the prompt is added
